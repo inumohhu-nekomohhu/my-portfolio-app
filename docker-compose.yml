@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+  # Rails バックエンド
+  api:
+    build: ./api
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    ports:
+      - 3000:3000
+    volumes:
+      - ./api:/myapp
+      - gem_data:/usr/local/bundle
+    depends_on:
+      - db
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: ${DATABASE_URL}
+      RUBYOPT: -rlogger
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+
+    
+
+  # Vite React フロントエンド
+  front:
+    build: ./front
+    command: npm run dev -- --host
+    ports:
+      - 5173:5173
+    volumes:
+      - ./front:/myapp
+    depends_on:
+      - api
+
+  # MySQL データベース
+  db:
+    image: mysql:8.0
+    ports:
+      - 4306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    env_file:
+      - .env
+
+volumes:
+  mysql-data:
+  gem_data:
+    driver: local

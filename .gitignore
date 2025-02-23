@@ -1,0 +1,16 @@
+# Ruby/Rails関連
+/log
+/tmp
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/vendor/bundle
+/.bundle
+/public/system
+/public/uploads
+/config/master.key
+
+# Node.js / React関連
+/node_modules
+/dist
+/.vite
+/.env*
