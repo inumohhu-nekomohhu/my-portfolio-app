@@ -5,6 +5,8 @@ Rails.application.routes.draw do
       resource :session, only: [:create, :destroy]
       # ユーザー登録用（Deviseのコントローラーを使うか、カスタム実装も可能）
       resources :users, only: [:create]
+      resources :pantry_items, only: [:create, :update, :index, :show, :destroy]
+      resources :recipes, only: [:index]
     end
   end
 
