@@ -19,7 +19,7 @@ RUN bundle install
 COPY . /myapp
 
 # entrypoint.shのコピーと実行権限の付与
-COPY entrypoint.sh /usr/bin/
+COPY ./entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 # エントリーポイントの設定
