@@ -12,6 +12,8 @@ import RequireAuth from './utils/RequireAuth';
 import Logout from './components/auth/Logout'; 
 
 const App: React.FC = () => {
+  console.log("本番でのAPI URLは:", import.meta.env.VITE_API_URL);
+
   return (
     <BrowserRouter>
       <Routes>
