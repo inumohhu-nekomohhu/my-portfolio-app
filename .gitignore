@@ -11,6 +11,5 @@
 
 # Node.js / React関連
 /node_modules
-/dist
 /.vite
 /.env*
