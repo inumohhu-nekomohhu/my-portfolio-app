@@ -28,5 +28,5 @@ ENTRYPOINT ["entrypoint.sh"]
 # ポートのエクスポート
 EXPOSE 3000
 
-# Railsサーバーの起動コマンド
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# Railsサーバーの起動コマンド（Puma）
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

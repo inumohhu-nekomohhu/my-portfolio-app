@@ -5,8 +5,19 @@ class Api::V1::RecipesController < ApplicationController
   def index
     # 認証済みユーザーのみここに到達する
     # 楽天レシピカテゴリAPIを使用してデータ取得
-    categories_response = HTTParty.get("https://app.rakuten.co.jp/…/recipe/category/list", { query: {...} })
-    rankings_response  = HTTParty.get("https://app.rakuten.co.jp/…/recipe/category/ranking", { query: {...} })
+    categories_response = HTTParty.get(
+      "https://app.rakuten.co.jp/services/api/Recipe/CategoryList/20170426", 
+      query: { applicationId: appid }
+    )
+    
+    rankings_response = HTTParty.get(
+      "https://app.rakuten.co.jp/services/api/Recipe/CategoryRanking/20170426", 
+      query: { 
+        applicationId: appid, 
+        categoryId: match['categoryId'], 
+        count: 10 
+      }
+    )
     # 必要なデータをパース・整形（ActiveModelSerializersを使用している場合はシリアライズ）
     render json: {
       categories: categories_response.parsed_response,
