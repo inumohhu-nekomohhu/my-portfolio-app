@@ -65,4 +65,7 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+
+  #写真・画像のホスト先（開発環境）
+  Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
 end

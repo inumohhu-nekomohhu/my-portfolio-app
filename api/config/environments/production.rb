@@ -56,4 +56,6 @@ Rails.application.configure do
   # ↓ Optionally allow all (not recommended for production)
   # config.hosts.clear
   
+  #写真・画像ホスト先（本番）
+  Rails.application.routes.default_url_options[:host] = 'https://my-api-env.eba-dtktsrwd.ap-northeast-1.elasticbeanstalk.com'
 end
