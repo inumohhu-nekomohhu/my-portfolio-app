@@ -1,16 +1,22 @@
 // frontend/src/utils/axiosClient.ts
 import axios from 'axios';
 
-// JWTトークンをlocalStorageから取得
-const token = localStorage.getItem('jwt');
-
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000', // 本番環境のURLに変更
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'multipart/form-data',
-    // トークンが存在すればAuthorizationヘッダーに追加
-    'Authorization': token ? `Bearer ${token}` : ''
   }
+});
+
+// 毎回リクエストごとに最新のJWTを取得
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('jwt');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default apiClient;
