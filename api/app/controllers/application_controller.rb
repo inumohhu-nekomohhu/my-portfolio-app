@@ -1,6 +1,5 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
-    protect_from_forgery with: :null_session
     private
     def authenticate_user!
       auth_header = request.headers['Authorization']
