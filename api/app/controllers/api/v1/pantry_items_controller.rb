@@ -76,12 +76,12 @@ class Api::V1::PantryItemsController < ApplicationController
       token = request.headers["Authorization"]&.split(" ")&.last
       Rails.logger.info( "トークン確認: #{token}")
       begin
-        Rails.logger.infol("秘密鍵２: #{Rails.application.credentials.secret_key_base}")
+        Rails.logger.info("秘密鍵２: #{Rails.application.credentials.secret_key_base}")
         payload = JWT.decode(token, Rails.application.credentials.secret_key_base, true, { algorithm: 'HS256' }).first
         Rails.logger.info( "ペイロード確認: #{Rails.application.credentials.secret_key_base}")
         @current_user = User.find(payload["user_id"])
       rescue
-        Rails.logger.infol("エラー2: #{Rails.application.credentials.secret_key_base}")
+        Rails.logger.info("エラー2: #{Rails.application.credentials.secret_key_base}")
         Rails.logger.info("エラー1")
         render json: { error: "Unauthorized" }, status: :unauthorized
       end
