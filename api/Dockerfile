@@ -25,8 +25,8 @@ RUN chmod +x /usr/bin/entrypoint.sh
 # エントリーポイントの設定
 ENTRYPOINT ["entrypoint.sh"]
 
-# ポートのエクスポート
-EXPOSE 3000
+#  ポートの変更：EXPOSE 80 に変更
+EXPOSE 80
 
-# Railsサーバーの起動コマンド（Puma）
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+#  Railsサーバーの起動ポートも 80 に変更
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-b", "tcp://0.0.0.0:80"]
