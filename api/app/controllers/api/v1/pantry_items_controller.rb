@@ -7,6 +7,7 @@ class Api::V1::PantryItemsController < ApplicationController
 
     
     def index
+      Rails.logger.info("index確認")
       pantry_items = current_user.pantry_items
       render json: pantry_items, each_serializer: PantryItemSerializer, status: :ok
     end
@@ -69,16 +70,16 @@ class Api::V1::PantryItemsController < ApplicationController
     def authenticate_user!
       # 例：JWTトークンからユーザーを取得する処理
       # ここでは current_user をセットする必要がある。
-      logger.debug "受け取ったJWT: #{request.headers["Authorization"]}"
+      Rails.logger.info( "受け取ったJWT: #{request.headers["Authorization"]}")
       token = request.headers["Authorization"]&.split(" ")&.last
-      logger.debug "トークン確認: #{token}"
+      Rails.logger.info( "トークン確認: #{token}")
       begin
-        logger.debug "秘密鍵２: #{Rails.application.credentials.secret_key_base}"
+        Rails.logger.infol("秘密鍵２: #{Rails.application.credentials.secret_key_base}")
         payload = JWT.decode(token, Rails.application.credentials.secret_key_base, true, { algorithm: 'HS256' }).first
-        logger.debug "ペイロード確認: #{Rails.application.credentials.secret_key_base}"
+        Rails.logger.info( "ペイロード確認: #{Rails.application.credentials.secret_key_base}")
         @current_user = User.find(payload["user_id"])
       rescue
-        logger.debug "エラー1"
+        Rails.logger.info("エラー1")
         render json: { error: "Unauthorized" }, status: :unauthorized
       end
     end
