@@ -40,6 +40,9 @@ const InventoryList: React.FC = () => {
       }
 
       try {
+        const headers = { Authorization: `Bearer ${token}` };
+        console.log("送信ヘッダー:", headers);  // ← 追加（API叩く直前のJWT確認）
+
         const res = await apiClient.get("/api/v1/pantry_items", {
           headers: { Authorization: `Bearer ${token}` } // トークンをヘッダーにセット
         });
