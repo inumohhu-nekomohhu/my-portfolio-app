@@ -1,14 +1,12 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
+    protect_from_forgery with: :null_session
     private
     def authenticate_user!
       auth_header = request.headers['Authorization']
-        # ログにAuthorizationヘッダーの内容を出力
-        logger.debug "Authorization Header: #{auth_header}"
       # Authorizationヘッダが無ければ401を返す
       logger.debug "Authorization header: #{auth_header}" # デバッグ用ログ出力
       unless auth_header&.start_with?('Bearer ')
-        logger.debug "1通る" # デバッグ用ログ出力
         return render json: { error: 'Unauthorized' }, status: :unauthorized
       end
   
