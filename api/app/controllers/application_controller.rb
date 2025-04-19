@@ -17,12 +17,14 @@ class ApplicationController < ActionController::API
       begin
         # トークンをデコードしてペイロード取得（HS256アルゴリズムを想定）
         payload, _ = JWT.decode(token, secret_key, true, { algorithm: 'HS256' })
+        Rails.logger.info("JWT decode 成功。ペイロード: #{payload.inspect}")
         # ペイロードからユーザーIDを取り出し、現在のユーザーとして設定
         @current_user = User.find(payload["user_id"])
       rescue ActiveRecord::RecordNotFound, JWT::DecodeError, JWT::ExpiredSignature
         # トークン不正・ユーザー不存在・期限切れ等の場合は401エラー
          logger.error "Authentication failed: #{e.message}" # 例外メッセージのログ出力
-        return render json: { error: 'Unauthorized' }, status: :unauthorized
+         Rails.logger.warn("JWT decode 失敗: #{e.message}")
+         return render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end
   
