@@ -81,6 +81,7 @@ class Api::V1::PantryItemsController < ApplicationController
         Rails.logger.info( "ペイロード確認: #{Rails.application.credentials.secret_key_base}")
         @current_user = User.find(payload["user_id"])
       rescue
+        ails.logger.infol("エラー2: #{Rails.application.credentials.secret_key_base}")
         Rails.logger.info("エラー1")
         render json: { error: "Unauthorized" }, status: :unauthorized
       end
