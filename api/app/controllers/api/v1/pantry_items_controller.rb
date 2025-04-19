@@ -70,6 +70,8 @@ class Api::V1::PantryItemsController < ApplicationController
     def authenticate_user!
       # 例：JWTトークンからユーザーを取得する処理
       # ここでは current_user をセットする必要がある。
+      Rails.logger.info("リクエストメソッド: #{request.request_method}")
+      Rails.logger.info("全ヘッダー一覧:\n" + request.headers.env.select { |k,v| k.start_with?('HTTP_') }.map { |k,v| "#{k}: #{v}" }.join("\n"))
       Rails.logger.info( "受け取ったJWT: #{request.headers["Authorization"]}")
       token = request.headers["Authorization"]&.split(" ")&.last
       Rails.logger.info( "トークン確認: #{token}")
