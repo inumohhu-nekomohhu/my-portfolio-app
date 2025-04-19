@@ -12,7 +12,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('jwt');
   if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers['X-Access-Token'] = `Bearer ${token}`; // ここを変更
   }
   return config;
 }, (error) => {

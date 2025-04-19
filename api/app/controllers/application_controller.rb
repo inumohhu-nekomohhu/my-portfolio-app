@@ -1,36 +1,31 @@
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
-    private
-    def authenticate_user!
-      auth_header = request.headers['Authorization']
-      # Authorizationヘッダが無ければ401を返す
-      ails.logger.info("Authorization header: #{auth_header}") # デバッグ用ログ出力
-      unless auth_header&.start_with?('Bearer ')
-        Rails.logger.info("1通る") # デバッグ用ログ出力
-        return render json: { error: 'Unauthorized' }, status: :unauthorized
-      end
-  
-      # "Bearer <token>"からトークン部分を抽出
-      token = auth_header.split(' ')[1]
-      secret_key = Rails.application.credentials.secret_key_base  # JWT署名に使ったキー
-  
-      begin
-        # トークンをデコードしてペイロード取得（HS256アルゴリズムを想定）
-        payload, _ = JWT.decode(token, secret_key, true, { algorithm: 'HS256' })
-        Rails.logger.info("JWT decode 成功。ペイロード: #{payload.inspect}")
-        # ペイロードからユーザーIDを取り出し、現在のユーザーとして設定
-        @current_user = User.find(payload["user_id"])
-      rescue ActiveRecord::RecordNotFound, JWT::DecodeError, JWT::ExpiredSignature
-        # トークン不正・ユーザー不存在・期限切れ等の場合は401エラー
-         logger.error "Authentication failed: #{e.message}" # 例外メッセージのログ出力
-         Rails.logger.info("JWT decode 失敗: #{e.message}")
-         return render json: { error: 'Unauthorized' }, status: :unauthorized
-      end
+  private
+
+  def authenticate_user!
+    auth_header = request.headers['Authorization'] || request.headers['X-Access-Token']
+    Rails.logger.info("Authorization header: #{auth_header}") # デバッグ用ログ出力
+
+    unless auth_header&.start_with?('Bearer ')
+      Rails.logger.info("1通る") # デバッグ用ログ出力
+      return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
-  
-    # 認証済みユーザーを取得するヘルパー（必要に応じて）
-    def current_user
-      @current_user
+
+    token = auth_header.split(' ')[1]
+    secret_key = Rails.application.credentials.secret_key_base
+
+    begin
+      payload, _ = JWT.decode(token, secret_key, true, { algorithm: 'HS256' })
+      Rails.logger.info("JWT decode 成功。ペイロード: #{payload.inspect}")
+      @current_user = User.find(payload["user_id"])
+    rescue ActiveRecord::RecordNotFound, JWT::DecodeError, JWT::ExpiredSignature => e
+      logger.error "Authentication failed: #{e.message}"
+      Rails.logger.info("JWT decode 失敗: #{e.message}")
+      return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
   end
-  
+
+  def current_user
+    @current_user
+  end
+end
