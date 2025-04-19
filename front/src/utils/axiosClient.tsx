@@ -5,7 +5,7 @@ import axios from 'axios';
 const token = localStorage.getItem('jwt');
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.REACT_APP_API_URL || 'http://localhost:3000', // 本番環境のURLに変更
   headers: {
     'Content-Type': 'multipart/form-data',
     // トークンが存在すればAuthorizationヘッダーに追加

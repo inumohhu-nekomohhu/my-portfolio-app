@@ -1,7 +1,5 @@
-// frontend/src/components/inventory/InventoryForm.tsx
 import React, { useState } from 'react';
 import apiClient from '../../utils/axiosClient';
-
 
 // 成功メッセージ、エラーメッセージ表示用コンポーネント
 interface MessageProps {
@@ -85,6 +83,13 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
     setErrorMessage('');
     setSuccessMessage('');
 
+    // トークンを取得
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      setErrorMessage("認証トークンがありません。再度ログインしてください。");
+      return;
+    }
+
     // バックエンドに合わせ、pantry_itemの入れ子構造にする
     const formData = new FormData();
     formData.append('pantry_item[name]', itemName);
@@ -97,13 +102,16 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
 
     try {
       const res = await apiClient.post('/api/v1/pantry_items', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}` // Authorizationヘッダーにトークンを追加
+        }
       });
       setSuccessMessage('食品情報を登録しました！');
-        // onSuccess があれば呼び出す
-       if (onSuccess) {
-         setTimeout(() => onSuccess(res.data), 1000)
-     }
+      // onSuccess があれば呼び出す
+      if (onSuccess) {
+        setTimeout(() => onSuccess(res.data), 1000);
+      }
     } catch (error) {
       console.error('在庫追加エラー:', error);
       setErrorMessage('在庫追加に失敗しました。');
@@ -112,87 +120,87 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
 
   return (
     <>
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-    <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">在庫アイテム追加</h2>
-      {successMessage && <Message type="success" message={successMessage} />}
-      {errorMessage && <Message type="error" message={errorMessage} />}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <InputField
-          id="itemName"
-          label="アイテム名"
-          type="text"
-          placeholder="例: 牛乳"
-          value={itemName}
-          onChange={e => setItemName(e.target.value)}
-          required
-        />
-        <InputField
-          id="quantity"
-          label="数量"
-          type="number"
-          placeholder="例: 2"
-          value={quantity}
-          onChange={e => setQuantity(+e.target.value)}
-          required
-        />
-        <InputField
-          id="minQuantity"
-          label="最小在庫レベル"
-          type="number"
-          placeholder="例: 3"
-          value={minQuantity}
-          onChange={e => setMinQuantity(+e.target.value)}
-          required
-        />
-        <div>
-          <label htmlFor="category" className="block text-gray-700 font-bold mb-2">カテゴリー</label>
-          <select
-            id="category"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          >
-            <option value="野菜">野菜</option>
-            <option value="肉類">肉類</option>
-            <option value="飲料">飲料</option>
-            <option value="その他">その他</option>
-            <option value="スイーツ">スイーツ</option>
-          </select>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+        <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-lg">
+          <h2 className="text-2xl font-bold mb-4 text-center">在庫アイテム追加</h2>
+          {successMessage && <Message type="success" message={successMessage} />}
+          {errorMessage && <Message type="error" message={errorMessage} />}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <InputField
+              id="itemName"
+              label="アイテム名"
+              type="text"
+              placeholder="例: 牛乳"
+              value={itemName}
+              onChange={e => setItemName(e.target.value)}
+              required
+            />
+            <InputField
+              id="quantity"
+              label="数量"
+              type="number"
+              placeholder="例: 2"
+              value={quantity}
+              onChange={e => setQuantity(+e.target.value)}
+              required
+            />
+            <InputField
+              id="minQuantity"
+              label="最小在庫レベル"
+              type="number"
+              placeholder="例: 3"
+              value={minQuantity}
+              onChange={e => setMinQuantity(+e.target.value)}
+              required
+            />
+            <div>
+              <label htmlFor="category" className="block text-gray-700 font-bold mb-2">カテゴリー</label>
+              <select
+                id="category"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                required
+              >
+                <option value="野菜">野菜</option>
+                <option value="肉類">肉類</option>
+                <option value="飲料">飲料</option>
+                <option value="その他">その他</option>
+                <option value="スイーツ">スイーツ</option>
+              </select>
+            </div>
+            <InputField
+              id="expirationDate"
+              label="賞味期限"
+              type="date"
+              value={expirationDate}
+              onChange={e => setExpirationDate(e.target.value)}
+              required
+            />
+            <div>
+              <label htmlFor="memo" className="block text-gray-700 font-bold mb-2">メモ</label>
+              <textarea
+                id="memo"
+                value={memo}
+                onChange={e => setMemo(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="itemImage" className="block text-gray-700 font-bold mb-2">画像アップロード</label>
+              <input id="itemImage" type="file" onChange={handleFileChange} className="w-full" />
+            </div>
+            <div className="flex justify-between mt-4">
+              <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                キャンセル
+              </button>
+              <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                追加する
+              </button>
+            </div>
+          </form>
         </div>
-        <InputField
-          id="expirationDate"
-          label="賞味期限"
-          type="date"
-          value={expirationDate}
-          onChange={e => setExpirationDate(e.target.value)}
-          required
-        />
-        <div>
-          <label htmlFor="memo" className="block text-gray-700 font-bold mb-2">メモ</label>
-          <textarea
-            id="memo"
-            value={memo}
-            onChange={e => setMemo(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="itemImage" className="block text-gray-700 font-bold mb-2">画像アップロード</label>
-          <input id="itemImage" type="file" onChange={handleFileChange} className="w-full" />
-        </div>
-        <div className="flex justify-between mt-4">
-          <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-            キャンセル
-          </button>
-          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-            追加する
-          </button>
-        </div>
-      </form>
-    </div>
-    </div>
+      </div>
     </>
   );
 };

@@ -1,4 +1,3 @@
-// frontend/src/components/inventory/InventoryList.tsx
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/axiosClient";
 import InventoryCard from "./InventoryCard";
@@ -25,12 +24,24 @@ const InventoryList: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // トークン取得関数
+  const getAuthToken = () => {
+    return localStorage.getItem("jwt"); // JWTトークンをlocalStorageから取得
+  };
+
   useEffect(() => {
     (async () => {
+      const token = getAuthToken(); // トークンを取得
+      console.log(token); // トークンが正しく取得されているか確認
+      if (!token) {
+        setError("認証が必要です");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("jwt");
         const res = await apiClient.get("/api/v1/pantry_items", {
-          headers: { Authorization: token ? `Bearer ${token}` : "" }
+          headers: { Authorization: `Bearer ${token}` } // トークンをヘッダーにセット
         });
         setItems(res.data);
       } catch (err) {

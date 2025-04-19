@@ -7,7 +7,7 @@ import InventoryForm from './components/inventory/InventoryForm';
 import InventoryPage from "./pages/InventoryPage";
 import RecipeSearch from './components/RecipeSearch';
 import SignUpForm from './components/auth/SignUpForm';
-import ScreenCheck from './components/ScreenCheck';
+//import ScreenCheck from './components/ScreenCheck';
 import RequireAuth from './utils/RequireAuth'; 
 import Logout from './components/auth/Logout'; 
 
@@ -18,7 +18,7 @@ const App: React.FC = () => {
         {/* 認証不要ページ */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUpForm />} />
-        <Route path="/" element={<ScreenCheck />} />
+        <Route path="/" element={<Login/>} />
         <Route path="/logout" element={<Logout />} />
         
 
