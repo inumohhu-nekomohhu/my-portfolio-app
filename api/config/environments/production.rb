@@ -54,5 +54,5 @@ Rails.application.configure do
   config.hosts << "my-api-env.eba-dtktsrwd.ap-northeast-1.elasticbeanstalk.com"
 
   # ↓ Optionally allow all (not recommended for production)
-  "config.hosts.clear
+  # config.hosts.clear
 end

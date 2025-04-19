@@ -68,12 +68,17 @@ class Api::V1::PantryItemsController < ApplicationController
     # 仮の認証メソッド（JWT認証等、実装に合わせて変更）
     def authenticate_user!
       # 例：JWTトークンからユーザーを取得する処理
-      # ここでは current_user をセットする必要があります。
+      # ここでは current_user をセットする必要がある。
+      logger.debug "受け取ったJWT: #{request.headers["Authorization"]}"
       token = request.headers["Authorization"]&.split(" ")&.last
+      logger.debug "トークン確認: #{token}"
       begin
+        logger.debug "秘密鍵２: #{Rails.application.credentials.secret_key_base}"
         payload = JWT.decode(token, Rails.application.credentials.secret_key_base, true, { algorithm: 'HS256' }).first
+        logger.debug "ペイロード確認: #{Rails.application.credentials.secret_key_base}"
         @current_user = User.find(payload["user_id"])
       rescue
+        logger.debug "エラー1"
         render json: { error: "Unauthorized" }, status: :unauthorized
       end
     end
