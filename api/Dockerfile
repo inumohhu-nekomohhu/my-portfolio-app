@@ -30,3 +30,5 @@ EXPOSE 80
 
 #  Railsサーバーの起動ポートも 80 に変更
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-b", "tcp://0.0.0.0:80"]
+
+#
