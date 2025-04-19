@@ -4,9 +4,9 @@ class ApplicationController < ActionController::API
     def authenticate_user!
       auth_header = request.headers['Authorization']
       # Authorizationヘッダが無ければ401を返す
-      logger.debug "Authorization header: #{auth_header}" # デバッグ用ログ出力
+      ails.logger.info("Authorization header: #{auth_header}") # デバッグ用ログ出力
       unless auth_header&.start_with?('Bearer ')
-        logger.debug "1通る" # デバッグ用ログ出力
+        Rails.logger.info("1通る") # デバッグ用ログ出力
         return render json: { error: 'Unauthorized' }, status: :unauthorized
       end
   
@@ -23,7 +23,7 @@ class ApplicationController < ActionController::API
       rescue ActiveRecord::RecordNotFound, JWT::DecodeError, JWT::ExpiredSignature
         # トークン不正・ユーザー不存在・期限切れ等の場合は401エラー
          logger.error "Authentication failed: #{e.message}" # 例外メッセージのログ出力
-         Rails.logger.warn("JWT decode 失敗: #{e.message}")
+         Rails.logger.info("JWT decode 失敗: #{e.message}")
          return render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end

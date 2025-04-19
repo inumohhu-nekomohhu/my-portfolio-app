@@ -55,4 +55,5 @@ Rails.application.configure do
 
   # ↓ Optionally allow all (not recommended for production)
   # config.hosts.clear
+  
 end
