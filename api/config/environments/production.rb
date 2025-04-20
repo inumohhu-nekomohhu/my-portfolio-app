@@ -19,7 +19,8 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Store uploaded files on the local file system.
-  config.active_storage.service = :local
+  # config.active_storage.service = :local 
+  config.active_storage.service = :amazon
 
   # Force all access to the app over SSL.
   config.force_ssl = true
@@ -58,6 +59,8 @@ Rails.application.configure do
   
   #写真・画像ホスト先（本番）
   Rails.application.routes.default_url_options[:host] = 'https://api.linuxstudy5678.com'
+  config.action_controller.default_url_options = { host: "https://api.linuxstudy5678.com" }
+  config.default_url_options = { host: "https://api.linuxstudy5678.com" }
 
   # Elastic Beanstalkの内部IPやロードバランサー経由のアクセスを許可
   config.hosts << /.*\.elasticbeanstalk\.com/
