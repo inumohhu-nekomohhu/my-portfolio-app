@@ -87,8 +87,8 @@ const InventoryList: React.FC = () => {
 
       {/* ② 追加用モーダル */}
       {showAddModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-auto my-10">
             <InventoryForm
               onSuccess={(newItem) => {
                 setItems(prev => [newItem, ...prev]);   // ⑤ 一覧に即時反映
