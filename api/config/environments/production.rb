@@ -51,11 +51,12 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Allow Elastic Beanstalk hostname
-  config.hosts << "my-api-env.eba-dtktsrwd.ap-northeast-1.elasticbeanstalk.com"
+  config.hosts << "my-api-env-v2.ap-northeast-1.elasticbeanstalk.com"
 
   # ↓ Optionally allow all (not recommended for production)
   # config.hosts.clear
   
   #写真・画像ホスト先（本番）
-  Rails.application.routes.default_url_options[:host] = 'https://my-api-env.eba-dtktsrwd.ap-northeast-1.elasticbeanstalk.com'
+  Rails.application.routes.default_url_options[:host] = 'https://my-api-env-v2.ap-northeast-1.elasticbeanstalk.com'
+
 end
