@@ -57,9 +57,10 @@ Rails.application.configure do
   # config.hosts.clear
   
   #写真・画像ホスト先（本番）
-  Rails.application.routes.default_url_options[:host] = 'https://my-api-env-v2.ap-northeast-1.elasticbeanstalk.com'
+  Rails.application.routes.default_url_options[:host] = 'https://api.linuxstudy5678.com'
 
   # Elastic Beanstalkの内部IPやロードバランサー経由のアクセスを許可
-config.hosts << /.*\.elasticbeanstalk\.com/
-#config.hosts << IPAddr.new("0.0.0.0/0")  # すべてのIPを許可（開発用。必要に応じて制限）
+  config.hosts << /.*\.elasticbeanstalk\.com/
+  config.hosts << "api.linuxstudy5678.com"
+  # config.hosts << IPAddr.new("0.0.0.0/0")  # すべてのIPを許可（開発用。必要に応じて制限）
 end
