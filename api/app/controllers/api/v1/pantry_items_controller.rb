@@ -3,9 +3,8 @@ class Api::V1::PantryItemsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    Rails.logger.info("index確認")
-    pantry_items = current_user.pantry_items
-    render json: pantry_items, each_serializer: PantryItemSerializer, status: :ok
+    pantry_items = @current_user.pantry_items.with_attached_item_image
+    render json: pantry_items, host: request.base_url
   end
 
   def create
