@@ -14,7 +14,7 @@ interface PantryItem {
   min_quantity: number;
   memo?: string;
   updated_at?: string;
-  photo_url?: string;
+  image_url?: string; // ← 修正ポイント
 }
 
 interface InventoryModalProps {
@@ -43,7 +43,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error" | null>(null);
 
-  // 賞味期限までの日数計算
   const calculateDaysRemaining = (expDate: string): number => {
     const today = new Date();
     const expiry = new Date(expDate);
@@ -117,7 +116,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
-        {/* 右上の大きめ×ボタン */}
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-3xl p-1"
@@ -131,14 +129,6 @@ const InventoryModal: React.FC<InventoryModalProps> = ({
         <h2 className="text-xl font-bold mb-4">
           {isEditing ? "編集モード" : item.name}
         </h2>
-
-        {item.photo_url && (
-          <img
-            src={item.photo_url}
-            alt={item.name}
-            className="w-full h-60 object-cover rounded-md mb-4"
-          />
-        )}
 
         {showConfirm ? (
           <>

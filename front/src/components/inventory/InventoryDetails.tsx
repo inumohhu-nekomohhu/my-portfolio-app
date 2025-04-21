@@ -7,10 +7,10 @@ interface PantryItem {
   category: string;
   expiration_date: string;
   quantity: number;
-  min_quantity: number; // 追加
-  memo?: string;       // 追加（メモはオプショナル）
+  min_quantity: number;
+  memo?: string;
   updated_at?: string;
-  photo_url?: string;
+  image_url?: string; // ← 修正ポイント
 }
 
 interface InventoryDetailsProps {
@@ -21,6 +21,15 @@ interface InventoryDetailsProps {
 const InventoryDetails: React.FC<InventoryDetailsProps> = ({ item, daysRemaining }) => {
   return (
     <div className="space-y-2">
+      {item.image_url && (
+        <div className="mb-4">
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className="w-full h-48 object-cover rounded-md"
+          />
+        </div>
+      )}
       <div>
         <strong>数量:</strong> {item.quantity}
       </div>

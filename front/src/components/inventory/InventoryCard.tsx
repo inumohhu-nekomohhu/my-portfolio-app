@@ -6,7 +6,7 @@ interface PantryItem {
   name: string;
   category: string;
   expiration_date: string; // ISO 8601 形式など、日付文字列
-  photo_url?: string;
+  image_url?: string; // ← 修正ポイント
 }
 
 interface InventoryCardProps {
@@ -15,18 +15,15 @@ interface InventoryCardProps {
 }
 
 const InventoryCard: React.FC<InventoryCardProps> = ({ item, onClick }) => {
-  // 賞味期限までの日数を計算する関数
   const calculateDaysRemaining = (expiration: string): number => {
     const today = new Date();
     const exp = new Date(expiration);
-    // 差分をミリ秒単位で取得し、日数に変換
     const diffTime = exp.getTime() - today.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const daysRemaining = calculateDaysRemaining(item.expiration_date);
 
-  // デフォルトはグレーの枠。期限切れなら赤、残り3日以内なら黄色にする。
   let borderColorClass = "border-green-300";
   if (daysRemaining < 0) {
     borderColorClass = "border-red-500";
@@ -39,9 +36,9 @@ const InventoryCard: React.FC<InventoryCardProps> = ({ item, onClick }) => {
       onClick={onClick}
       className={`bg-white p-2 rounded shadow-lg cursor-pointer border-2 ${borderColorClass}`}
     >
-      {item.photo_url ? (
+      {item.image_url ? ( // ← 修正ポイント
         <img
-          src={item.photo_url}
+          src={item.image_url}
           alt={item.name}
           className="w-72 h-72 object-cover rounded-md"
         />

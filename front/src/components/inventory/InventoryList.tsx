@@ -14,7 +14,7 @@ interface PantryItem {
   min_quantity: number;
   memo?: string;
   updated_at?: string;
-  photo_url?: string;
+  image_url?: string;
 }
 
 const InventoryList: React.FC = () => {
@@ -44,7 +44,7 @@ const InventoryList: React.FC = () => {
 
         const res = await apiClient.get("/api/v1/pantry_items", {
           headers: { Authorization: `Bearer ${token}` }
-        });
+        });console.log(res.data); 
         setItems(res.data);
       } catch (err) {
         console.error("在庫一覧取得エラー:", err);
