@@ -1,5 +1,4 @@
 class Api::V1::PantryItemsController < ApplicationController
-  # APIモードではCSRF保護は通常不要（必要ならskip_before_action :verify_authenticity_token）
   before_action :authenticate_user!
 
   def index
@@ -9,7 +8,9 @@ class Api::V1::PantryItemsController < ApplicationController
 
   def create
     pantry_item = current_user.pantry_items.new(pantry_item_params)
+
     if params[:item_image]
+      # Rails 7.1 未満では public: true を使えないため、通常の attach を使用
       pantry_item.item_image.attach(params[:item_image])
     end
 
@@ -50,9 +51,7 @@ class Api::V1::PantryItemsController < ApplicationController
     params.require(:pantry_item).permit(:name, :quantity, :min_quantity, :category, :expiration_date, :memo)
   end
 
-  # 修正版のJWT認証処理(ALBが勝手にヘッダーを消すようなので、追加対応)
   def authenticate_user!
-    # Authorization が届かない場合を想定し、X-Access-Token も見る
     auth_header = request.headers['Authorization'] || request.headers['X-Access-Token']
     Rails.logger.info("Authorizationヘッダー確認: #{auth_header}")
 
@@ -71,25 +70,6 @@ class Api::V1::PantryItemsController < ApplicationController
       return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
   end
-
-  # 旧バージョン（コメントアウト）
-  # def authenticate_user!
-  #   Rails.logger.info("リクエストメソッド: #{request.request_method}")
-  #   Rails.logger.info("全ヘッダー一覧:\n" + request.headers.env.select { |k,v| k.start_with?('HTTP_') }.map { |k,v| "#{k}: #{v}" }.join("\n"))
-  #   Rails.logger.info( "受け取ったJWT: #{request.headers["Authorization"]}")
-  #   token = request.headers["Authorization"]&.split(" ")&.last
-  #   Rails.logger.info( "トークン確認: #{token}")
-  #   begin
-  #     Rails.logger.info("秘密鍵２: #{Rails.application.credentials.secret_key_base}")
-  #     payload = JWT.decode(token, Rails.application.credentials.secret_key_base, true, { algorithm: 'HS256' }).first
-  #     Rails.logger.info( "ペイロード確認: #{Rails.application.credentials.secret_key_base}")
-  #     @current_user = User.find(payload["user_id"])
-  #   rescue
-  #     Rails.logger.info("エラー2: #{Rails.application.credentials.secret_key_base}")
-  #     Rails.logger.info("エラー1")
-  #     render json: { error: "Unauthorized" }, status: :unauthorized
-  #   end
-  # end
 
   def current_user
     @current_user
