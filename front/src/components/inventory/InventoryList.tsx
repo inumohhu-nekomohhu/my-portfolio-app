@@ -87,6 +87,7 @@ const InventoryList: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
             <InventoryForm
+              showHeader={false} // モーダルではヘッダー非表示
               onSuccess={(newItem) => {
                 setItems(prev => [newItem, ...prev]);
                 setShowAddModal(false);

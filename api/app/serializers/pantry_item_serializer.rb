@@ -1,3 +1,4 @@
+# app/serializers/pantry_item_serializer.rb
 class PantryItemSerializer < ActiveModel::Serializer
   include Rails.application.routes.url_helpers
 
@@ -15,11 +16,7 @@ class PantryItemSerializer < ActiveModel::Serializer
   private
 
   def host
-    # default_url_options[:host] は controller で定義しているので、それを fallback として取得
-    if instance_options[:host].present?
-      instance_options[:host]
-    else
-      Rails.application.credentials.dig(:host) || ENV.fetch("HOST", "localhost:3000")
-    end
+    # 優先：インスタンスオプション → 環境変数 → デフォルト
+    instance_options[:host].presence || ENV.fetch("HOST", "https://api.linuxstudy5678.com")
   end
 end

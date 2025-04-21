@@ -5,6 +5,7 @@ import {
   Recipe,
   CategoryListResult,
 } from '../services/recipeApi';
+import Header from './common/Header'; // ✅ ヘッダー追加
 
 const RecipeSearch: React.FC = () => {
   const [keyword, setKeyword] = useState<string>('');
@@ -77,8 +78,15 @@ const RecipeSearch: React.FC = () => {
           "url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=1932&q=80')",
       }}
     >
+      {/* 背景の暗幕 */}
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
+      {/* ヘッダーを最上部に横断表示（背景より上、カードより前） */}
+      <div className="absolute top-0 left-0 right-0 z-20 w-full">
+        <Header />
+      </div>
+
+      {/* 検索フォームのカード（画面中央表示） */}
       <div className="relative z-10 w-full max-w-xl bg-white bg-opacity-90 p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2 text-center text-gray-800">
           今日の献立は何にする？
@@ -122,6 +130,7 @@ const RecipeSearch: React.FC = () => {
         </div>
       </div>
 
+      {/* モーダル表示：レシピ詳細 */}
       {selectedRecipe && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white w-full max-w-lg p-6 rounded relative">

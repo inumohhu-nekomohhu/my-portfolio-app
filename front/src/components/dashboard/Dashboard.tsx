@@ -1,4 +1,3 @@
-// frontend/src/components/dashboard/Dashboard.tsx
 import React from 'react';
 import Header from '../common/Header';
 
@@ -10,11 +9,22 @@ const Dashboard: React.FC = () => {
         className="min-h-screen bg-cover bg-center px-6 py-10 relative flex flex-col items-center justify-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1470549813517-2fa741d25c92?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+            "url('https://images.unsplash.com/photo-1470549813517-2fa741d25c92?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3')",
         }}
       >
+        {/* 背景の黒フィルター */}
         <div className="absolute inset-0 bg-black opacity-40 z-0" />
+
+        {/* カード全体 */}
         <div className="relative z-10 max-w-4xl w-full bg-white bg-opacity-90 p-8 rounded-lg shadow-lg animate-fadeIn">
+
+          {/* 🦊 フェネックをカード上部中央に表示 */}
+          <img
+            src="/animal_fennec.png"
+            alt="フェネック"
+            className="w-36 h-36 absolute -top-28 right-16 animate-wiggle z-20"
+          />
+
           <h1 className="text-3xl font-bold text-center text-green-800 mb-6">
             Smart Pantry Manager へようこそ
           </h1>

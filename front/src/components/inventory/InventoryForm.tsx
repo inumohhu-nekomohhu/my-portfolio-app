@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom"; // ✅ 追加：画面遷移用
 import apiClient from '../../utils/axiosClient';
+import Header from '../common/Header';
+import { CATEGORY_OPTIONS } from "../../constants/categoryOptions";
 
-// 成功メッセージ、エラーメッセージ表示用コンポーネント
 interface MessageProps {
   type: 'success' | 'error';
   message: string;
@@ -15,7 +17,6 @@ const Message: React.FC<MessageProps> = ({ type, message }) => {
   return <div className={className}>{message}</div>;
 };
 
-// 汎用入力フィールド
 interface InputFieldProps {
   id: string;
   label: string;
@@ -42,8 +43,6 @@ const InputField: React.FC<InputFieldProps> = ({ id, label, type, placeholder, v
   </div>
 );
 
-// ラベル付きの入力欄（テキスト、数値、日付など共通して使えるシンプルな入力フィールド）
-// 新規登録後に返されるアイテム型
 interface PantryItem {
   id: number;
   name: string;
@@ -59,9 +58,16 @@ interface PantryItem {
 interface InventoryFormProps {
   onSuccess?: (newItem: PantryItem) => void;
   onCancel?: () => void;
+  showHeader?: boolean;
 }
 
-const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) => {
+const InventoryForm: React.FC<InventoryFormProps> = ({
+  onSuccess,
+  onCancel,
+  showHeader = true
+}) => {
+  const navigate = useNavigate(); // ✅ 追加：画面遷移フック
+
   const [itemName, setItemName] = useState('');
   const [quantity, setQuantity] = useState<number>(0);
   const [minQuantity, setMinQuantity] = useState<number>(0);
@@ -83,14 +89,12 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
     setErrorMessage('');
     setSuccessMessage('');
 
-    // トークンを取得
     const token = localStorage.getItem("jwt");
     if (!token) {
       setErrorMessage("認証トークンがありません。再度ログインしてください。");
       return;
     }
 
-    // バックエンドに合わせ、pantry_itemの入れ子構造にする
     const formData = new FormData();
     formData.append('pantry_item[name]', itemName);
     formData.append('pantry_item[quantity]', quantity.toString());
@@ -104,14 +108,21 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
       const res = await apiClient.post('/api/v1/pantry_items', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}` // Authorizationヘッダーにトークンを追加
+          'Authorization': `Bearer ${token}`
         }
       });
+
       setSuccessMessage('食品情報を登録しました！');
-      // onSuccess があれば呼び出す
+
       if (onSuccess) {
         setTimeout(() => onSuccess(res.data), 1000);
       }
+
+      // ページ遷移から来ている場合のみ、在庫一覧に自動遷移
+      if (showHeader) {
+        setTimeout(() => navigate("/inventory"), 1000);
+      }
+
     } catch (error) {
       console.error('在庫追加エラー:', error);
       setErrorMessage('在庫追加に失敗しました。');
@@ -120,6 +131,8 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
 
   return (
     <>
+      {showHeader && <Header />}
+
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
         <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-lg">
           <h2 className="text-2xl font-bold mb-4 text-center">在庫アイテム追加</h2>
@@ -162,11 +175,11 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               >
-                <option value="野菜">野菜</option>
-                <option value="肉類">肉類</option>
-                <option value="飲料">飲料</option>
-                <option value="その他">その他</option>
-                <option value="スイーツ">スイーツ</option>
+                {CATEGORY_OPTIONS.map(option => (
+                  <option key={option} value={option}>
+                    {option}
+                </option>
+                ))}
               </select>
             </div>
             <InputField
@@ -190,14 +203,29 @@ const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, onCancel }) =>
               <label htmlFor="itemImage" className="block text-gray-700 font-bold mb-2">画像アップロード</label>
               <input id="itemImage" type="file" onChange={handleFileChange} className="w-full" />
             </div>
+
+            {/* ボタン左右分離表示（キャンセルはモーダル時のみ） */}
             <div className="flex justify-between mt-4">
-              <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-                キャンセル
-              </button>
-              <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+              {showHeader ? (
+                <div />
+              ) : (
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  キャンセル
+                </button>
+              )}
+
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
                 追加する
               </button>
             </div>
+
           </form>
         </div>
       </div>

@@ -1,19 +1,19 @@
-// frontend/src/components/inventory/InventoryEditForm.tsx
 import React from "react";
+import { CATEGORY_OPTIONS } from "../../constants/categoryOptions";
 
 interface InventoryEditFormProps {
   name: string;
   quantity: number;
-  min_quantity: number;      // 追加
+  min_quantity: number;
   category: string;
   expiration_date: string;
-  memo: string;              // 追加
+  memo: string;
   onNameChange: (value: string) => void;
   onQuantityChange: (value: number) => void;
-  onMinQuantityChange: (value: number) => void;  // 追加
+  onMinQuantityChange: (value: number) => void;
   onCategoryChange: (value: string) => void;
   onExpirationDateChange: (value: string) => void;
-  onMemoChange: (value: string) => void;         // 追加
+  onMemoChange: (value: string) => void;
 }
 
 const InventoryEditForm: React.FC<InventoryEditFormProps> = ({
@@ -61,12 +61,17 @@ const InventoryEditForm: React.FC<InventoryEditFormProps> = ({
       </div>
       <div>
         <strong>カテゴリー:</strong>{" "}
-        <input
-          type="text"
+        <select
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
           className="p-1 border rounded"
-        />
+        >
+          {CATEGORY_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <strong>賞味期限:</strong>{" "}
