@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../common/Header';
 
 const Dashboard: React.FC = () => {
@@ -17,7 +18,6 @@ const Dashboard: React.FC = () => {
 
         {/* カード全体 */}
         <div className="relative z-10 max-w-4xl w-full bg-white bg-opacity-90 p-8 rounded-lg shadow-lg animate-fadeIn">
-
           {/* 🦊 フェネックをカード上部中央に表示 */}
           <img
             src="/animal_fennec.png"
@@ -31,6 +31,17 @@ const Dashboard: React.FC = () => {
           <p className="text-lg text-gray-700 mb-4 leading-relaxed">
             このアプリは、家庭の食材在庫を管理し、使い切るためのレシピを提案することを目的とした、ポートフォリオ用の開発中アプリケーションです。
           </p>
+
+          {/* 🔗 開発者プロフィールへのリンク */}
+          <div className="flex justify-center mb-6">
+            <Link
+              to="/profile"
+              className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              開発者プロフィールを見る
+            </Link>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
             <div className="bg-white rounded shadow p-4 border border-gray-200">
               <h2 className="text-xl font-semibold mb-2 text-green-700">現在実装されている主な機能</h2>

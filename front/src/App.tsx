@@ -7,12 +7,12 @@ import InventoryForm from './components/inventory/InventoryForm';
 import InventoryPage from "./pages/InventoryPage";
 import RecipeSearch from './components/RecipeSearch';
 import SignUpForm from './components/auth/SignUpForm';
-//import ScreenCheck from './components/ScreenCheck';
-import RequireAuth from './utils/RequireAuth'; 
-import Logout from './components/auth/Logout'; 
+import RequireAuth from './utils/RequireAuth';
+import Logout from './components/auth/Logout';
+import ProfilePage from './pages/ProfilePage'; // 追加
 
 const App: React.FC = () => {
-  console.log("本番でのAPI URLは:", import.meta.env.VITE_API_URL);
+  //console.log("本番でのAPI URLは:", import.meta.env.VITE_API_URL);
 
   return (
     <BrowserRouter>
@@ -20,9 +20,8 @@ const App: React.FC = () => {
         {/* 認証不要ページ */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUpForm />} />
-        <Route path="/" element={<Login/>} />
+        <Route path="/" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
-        
 
         {/* 認証が必要なページ */}
         <Route
@@ -54,6 +53,14 @@ const App: React.FC = () => {
           element={
             <RequireAuth>
               <RecipeSearch />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <ProfilePage />
             </RequireAuth>
           }
         />
