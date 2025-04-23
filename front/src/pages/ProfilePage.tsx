@@ -8,9 +8,9 @@ const ProfilePage: React.FC = () => {
       <Header />
       <div className="min-h-screen bg-gray-50 px-6 py-12 flex flex-col items-center justify-start">
         <div className="max-w-3xl w-full bg-white rounded-xl shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">自己紹介</h1>
+          <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">～自己紹介～</h1>
           <p className="text-lg text-gray-700 leading-relaxed mb-8">
-            はじめまして。河村 由也と申します。。<br />
+            はじめまして。河村 由也と申します。<br />
             これまで金融系・製造業向けの業務システムの開発や保守に従事してきました。<br />
             COBOLやJCLを用いた大規模会計システムの開発経験、VBAを活用したRPAの構築経験など、レガシーな技術からモダンな開発環境まで、幅広く経験しております。
             <br /><br />
