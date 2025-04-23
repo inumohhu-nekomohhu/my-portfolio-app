@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   return (
     <header className="bg-green-500 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Smart Pantry Manager</h1>
+        <Link to="/dashboard" className="text-3xl font-bold">Smart Pantry Manager</Link>
         <nav className="flex items-center space-x-4">
           <Link to="/dashboard" className="hover:underline">ダッシュボード</Link>
           <Link to="/inventory/new" className="hover:underline">在庫の追加</Link>
