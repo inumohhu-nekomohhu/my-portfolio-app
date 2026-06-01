@@ -1,0 +1,11 @@
+﻿{
+  "mcpServers": {
+    "vitest": {
+      "command": "npx",
+      "args": ["vitest", "--mcp"],
+      "env": {
+        "NODE_ENV": "test"
+      }
+    }
+  }
+}
