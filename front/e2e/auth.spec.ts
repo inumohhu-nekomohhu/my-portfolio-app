@@ -4,27 +4,69 @@
 // 前提: docker compose up -d でローカル環境が起動していること
 
 test.describe('認証フロー', () => {
-  test('ログイン画面が表示される', async ({ page }) => {
-    await page.goto('/')
-    await expect(page).toHaveURL(/login/)
-    await expect(page.getByRole('button', { name: /ログイン/i })).toBeVisible()
+
+  test.describe('ログイン画面の表示', () => {
+    test('ルートにアクセスするとログイン画面にリダイレクトされる', async ({ page }) => {
+      await page.goto('/')
+      await expect(page).toHaveURL(/login/)
+    })
+
+    test('ログイン画面の必須要素が表示されている', async ({ page }) => {
+      await page.goto('/login')
+      await expect(page.getByPlaceholder('メールアドレス')).toBeVisible()
+      await expect(page.getByPlaceholder('パスワード')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'ログイン' })).toBeVisible()
+      await expect(page.getByRole('link', { name: 'こちら' })).toBeVisible()
+    })
+
+    test('ログイン画面のスクリーンショット（ビジュアルリグレッション）', async ({ page }) => {
+      await page.goto('/login')
+      // アニメーション完了を待つ
+      await page.waitForTimeout(500)
+      await expect(page).toHaveScreenshot('login-page.png', {
+        // 背景画像などの動的コンテンツをマスク
+        mask: [page.locator('img')],
+      })
+    })
   })
 
-  test('無効な認証情報でログイン失敗する', async ({ page }) => {
-    await page.goto('/login')
-    await page.getByLabel(/メールアドレス/i).fill('invalid@example.com')
-    await page.getByLabel(/パスワード/i).fill('wrongpassword')
-    await page.getByRole('button', { name: /ログイン/i }).click()
-    // エラーメッセージが表示されることを確認
-    await expect(page.getByText(/メールアドレスまたはパスワード/i)).toBeVisible()
+  test.describe('ログイン操作', () => {
+    test('無効な認証情報でログイン失敗しエラーが表示される', async ({ page }) => {
+      await page.goto('/login')
+      await page.getByPlaceholder('メールアドレス').fill('invalid@example.com')
+      await page.getByPlaceholder('パスワード').fill('wrongpassword')
+      await page.getByRole('button', { name: 'ログイン' }).click()
+      await expect(page.getByText(/メールアドレスまたはパスワード/i)).toBeVisible()
+    })
+
+    test('空のフォームで送信するとHTML5バリデーションが動作する', async ({ page }) => {
+      await page.goto('/login')
+      await page.getByRole('button', { name: 'ログイン' }).click()
+      // required属性によりフォーム送信されない（URLが変わらない）
+      await expect(page).toHaveURL(/login/)
+    })
+
+    test('サインアップリンクをクリックするとサインアップ画面に遷移する', async ({ page }) => {
+      await page.goto('/login')
+      await page.getByRole('link', { name: 'こちら' }).click()
+      await expect(page).toHaveURL(/signup/)
+    })
   })
 
-  // 有効なユーザーでのログインテストは開発再開時に追加
-  // test('有効な認証情報でログイン成功する', async ({ page }) => {
-  //   await page.goto('/login')
-  //   await page.getByLabel(/メールアドレス/i).fill('test@example.com')
-  //   await page.getByLabel(/パスワード/i).fill('password')
-  //   await page.getByRole('button', { name: /ログイン/i }).click()
-  //   await expect(page).toHaveURL(/dashboard/)
-  // })
+  test.describe('認証ガード', () => {
+    test('未ログイン状態で在庫ページにアクセスするとログインにリダイレクトされる', async ({ page }) => {
+      await page.goto('/inventory')
+      await expect(page).toHaveURL(/login/)
+    })
+
+    test('未ログイン状態でダッシュボードにアクセスするとログインにリダイレクトされる', async ({ page }) => {
+      await page.goto('/dashboard')
+      await expect(page).toHaveURL(/login/)
+    })
+
+    test('未ログイン状態でレシピ検索にアクセスするとログインにリダイレクトされる', async ({ page }) => {
+      await page.goto('/recipes/search')
+      await expect(page).toHaveURL(/login/)
+    })
+  })
 })
