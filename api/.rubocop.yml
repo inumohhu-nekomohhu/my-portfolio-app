@@ -1,0 +1,76 @@
+﻿# SmartPantryManager - RuboCop設定
+# 方針: 学習・ポートフォリオ用途のため厳しすぎず実用的な設定
+
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'config/environments/**/*'
+
+# --- スタイル ---
+# 1行の最大文字数（Railsコードは長くなりがち）
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'config/**/*'
+
+# メソッドの最大行数を緩和
+Metrics/MethodLength:
+  Max: 20
+
+# クラスの最大行数を緩和
+Metrics/ClassLength:
+  Max: 150
+
+# ブロックの最大行数を緩和
+Metrics/BlockLength:
+  Max: 30
+  Exclude:
+    - 'spec/**/*'
+    - 'config/**/*'
+
+# ABCメトリクスを緩和（複雑度の指標）
+Metrics/AbcSize:
+  Max: 25
+
+# Cyclomatic Complexityを緩和
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+# --- Rails固有 ---
+# Strong Parametersの使用を強制
+Rails/StrongParameters:
+  Enabled: true
+
+# スコープのlambda使用を推奨
+Rails/FindBy:
+  Enabled: true
+
+# ---  文字列 ---
+# ダブルクォートよりシングルクォートを推奨
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+# --- ドキュメント ---
+# クラスへのコメント不要（個人開発のため）
+Style/Documentation:
+  Enabled: false
+
+# --- 未使用変数 ---
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# --- コントローラー ---
+# Fat Controller検知（アクション数の上限）
+Metrics/MethodLength:
+  Exclude:
+    - 'spec/**/*'
