@@ -1,4 +1,4 @@
-# SmartPantryManager - CLAUDE.md
+﻿# SmartPantryManager - CLAUDE.md
 
 ## プロジェクト概要
 
@@ -32,9 +32,9 @@ docker compose exec api rails db:migrate
 ## 技術スタック
 
 ### Frontend（`front/` ディレクトリ）
-- React + TypeScript + Vite
-- Tailwind CSS / Chakra UI v3
-- React Router v6
+- React 19 + TypeScript 5 + Vite 6
+- Tailwind CSS 3（スタイルはTailwindのみ・Chakra UIは削除済み）
+- React Router v7
 - axios（axiosClient経由のみ・fetch直接利用禁止）
 - JWT認証（localStorage保存）
 
@@ -58,6 +58,11 @@ docker compose exec api rails db:migrate
 - `any` 禁止（やむを得ない場合はコメントで理由を記載）
 - UIとロジックを分離（カスタムフックを活用）
 - API通信は必ず `axiosClient.ts` 経由
+- `fetch` 直接利用は禁止（ESLintでエラー検知済み）
+- typeのみのimportは `import type` を使用
+- propsの型定義は必ず明示する
+- `useEffect` の依存配列に `eslint-disable` コメントを使わない
+- `console.log` を本番コードに残さない（`console.warn` / `console.error` は可）
 
 ### Rails
 - Fat Controller回避（ロジックはモデル / サービスへ）
@@ -67,6 +72,14 @@ docker compose exec api rails db:migrate
 ### Tailwind
 - Utility Firstを徹底
 - 独自CSSは最小限に抑える
+- Chakra UIは使用しない（削除済み）
+
+### ESLint（front/eslint.config.js）
+- `@typescript-eslint/no-explicit-any`: error（any禁止）
+- `no-restricted-globals fetch`: error（fetch直接利用禁止）
+- `no-console`: warn（console.logを本番に残さない）
+- `react-hooks/exhaustive-deps`: warn（依存配列の漏れを検知）
+- `@typescript-eslint/consistent-type-imports`: warn（type importを強制）
 
 ---
 
@@ -75,16 +88,31 @@ docker compose exec api rails db:migrate
 ### Frontend
 ```
 front/src/
-├── axiosClient.ts          # axios共通設定・インターセプタ
+├── axiosClient.ts          # axios共通設定・インターセプタ（API通信はここ経由のみ）
+├── App.tsx                 # ルーティング定義
 ├── components/
-│   ├── RequireAuth.tsx     # 認証ガード
+│   ├── auth/
+│   │   ├── Login.tsx
+│   │   └── SignUpForm.tsx
+│   ├── common/
+│   │   └── Header.tsx
+│   ├── dashboard/
+│   │   └── Dashboard.tsx
 │   ├── inventory/
 │   │   ├── InventoryForm.tsx
-│   │   └── InventoryEditForm.tsx
-│   └── user/
-│       └── UserManagement.tsx
-└── hooks/
-    └── useAllUsers.ts
+│   │   ├── InventoryEditForm.tsx
+│   │   ├── InventoryList.tsx
+│   │   ├── InventoryCard.tsx
+│   │   ├── InventoryModal.tsx
+│   │   └── InventoryDetails.tsx
+│   └── RecipeSearch.tsx
+├── pages/
+│   ├── InventoryPage.tsx
+│   └── ProfilePage.tsx
+├── services/
+│   └── recipeApi.ts        # 楽天レシピAPI（fetch直接利用中・要修正）
+└── utils/
+    └── RequireAuth.tsx     # 認証ガード
 ```
 
 ### Backend
@@ -143,8 +171,9 @@ npm run build
 - `.env` / `master.key` をGitにコミットしない
 - 本番RDSを開発環境から直接操作しない
 - 画像はフロントS3バケットではなく `my-inventry-images` に保存
-- Chakra UI v3では `value` プロパティが必須（v2と挙動が異なる）
+- `fetch` を直接使わない（axiosClient経由のみ・ESLintでエラー検知済み）
 - `config.hosts` に本番ドメインがないと「Blocked hosts」エラー
+- services/recipeApi.ts でfetchを直接使用中（既知のlintエラー・要修正）
 
 ---
 
@@ -157,6 +186,7 @@ npm run build
 | InvalidMessage | RAILS_MASTER_KEY不一致 | EBの環境変数を再設定 |
 | CORS error | cors.rb のオリジン設定漏れ | CloudFront URLを許可リストに追加 |
 | 画像404 | S3設定・IAM権限不足 | storage.yml・IAMポリシー確認 |
+| ESLint error（fetch） | recipeApi.tsでfetch直接利用 | axiosClientに書き換え |
 
 ---
 
@@ -164,6 +194,6 @@ npm run build
 
 「技術的な最適解」より「実際に動作すること」を優先する。
 
-複数案がある場合は **推奨案 → 簡易案 → 本格案** の順で提示する。
+複数案がある場合は 推奨案 → 簡易案 → 本格案 の順で提示する。
 
 不明点がある場合は推測で断定せず、確認すべき情報（コード・ログ・AWS設定値）を明示してから回答する。
