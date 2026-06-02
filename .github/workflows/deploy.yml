@@ -1,0 +1,142 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # 手動実行も可能
+  workflow_dispatch:
+
+# テストが通った後にデプロイを実行
+# CIワークフローとは別ファイルにして役割を分離
+
+jobs:
+  # -----------------------------------------------
+  # バックエンド: Elastic Beanstalkへデプロイ
+  # -----------------------------------------------
+  deploy-backend:
+    name: Deploy Backend (Elastic Beanstalk)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: AWSクレデンシャル設定
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: デプロイパッケージ作成（apiディレクトリをzip）
+        run: |
+          cd api
+          zip -r ../deploy-package.zip . \
+            --exclude "*.git*" \
+            --exclude "node_modules/*" \
+            --exclude "log/*" \
+            --exclude "tmp/*" \
+            --exclude "spec/*" \
+            --exclude ".rspec" \
+            --exclude "*.md"
+          echo "パッケージサイズ: $(du -sh ../deploy-package.zip)"
+
+      - name: S3にデプロイパッケージをアップロード
+        run: |
+          VERSION_LABEL="deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA::8}"
+          echo "VERSION_LABEL=${VERSION_LABEL}" >> $GITHUB_ENV
+          aws s3 cp deploy-package.zip \
+            s3://my-portfolio-frontend-20250419/deploy-packages/${VERSION_LABEL}.zip
+
+      - name: EBアプリケーションバージョン作成
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name my-api-app \
+            --version-label "${{ env.VERSION_LABEL }}" \
+            --source-bundle S3Bucket=my-portfolio-frontend-20250419,S3Key=deploy-packages/${{ env.VERSION_LABEL }}.zip \
+            --region ap-northeast-1
+
+      - name: EBへデプロイ
+        run: |
+          aws elasticbeanstalk update-environment \
+            --application-name my-api-app \
+            --environment-name my-api-env-v2 \
+            --version-label "${{ env.VERSION_LABEL }}" \
+            --region ap-northeast-1
+
+      - name: デプロイ完了待機（ヘルスチェック）
+        run: |
+          echo "EB環境のヘルス確認中..."
+          for i in {1..20}; do
+            STATUS=$(aws elasticbeanstalk describe-environments \
+              --application-name my-api-app \
+              --environment-names my-api-env-v2 \
+              --region ap-northeast-1 \
+              --query "Environments[0].Health" \
+              --output text)
+            echo "試行 $i/20: ステータス = $STATUS"
+            if [ "$STATUS" = "Green" ]; then
+              echo "✅ デプロイ成功！"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "❌ タイムアウト: 10分以内にGreenになりませんでした"
+          exit 1
+
+  # -----------------------------------------------
+  # フロントエンド: S3へデプロイ + CloudFrontキャッシュ無効化
+  # -----------------------------------------------
+  deploy-frontend:
+    name: Deploy Frontend (S3 + CloudFront)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node.jsセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: front/package-lock.json
+
+      - name: 依存パッケージインストール
+        run: cd front && npm ci
+
+      - name: ビルド
+        run: cd front && npm run build
+        env:
+          VITE_API_URL: https://api.linuxstudy5678.com
+
+      - name: AWSクレデンシャル設定
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: S3へアップロード
+        run: |
+          aws s3 sync front/dist s3://my-portfolio-frontend-20250419 \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --exclude "index.html"
+          # index.htmlはキャッシュしない
+          aws s3 cp front/dist/index.html s3://my-portfolio-frontend-20250419/index.html \
+            --cache-control "no-cache, no-store, must-revalidate"
+          echo "✅ S3アップロード完了"
+
+      - name: CloudFrontキャッシュ無効化
+        run: |
+          # CloudFront Distribution IDを取得
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?contains(Origins.Items[0].DomainName, 'my-portfolio-frontend')].Id" \
+            --output text)
+          if [ -z "$DISTRIBUTION_ID" ]; then
+            echo "⚠️ CloudFront Distribution IDが取得できませんでした。手動で無効化してください。"
+          else
+            aws cloudfront create-invalidation \
+              --distribution-id "$DISTRIBUTION_ID" \
+              --paths "/*"
+            echo "✅ CloudFrontキャッシュ無効化完了 (Distribution: $DISTRIBUTION_ID)"
+          fi
